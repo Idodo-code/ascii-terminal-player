@@ -15,16 +15,15 @@ python -m pip install -r requirements.txt
 python ascii_terminal.py
 ```
 
-Run it with no arguments and you'll get a numbered list of video files found next to
-the script to choose from, instead of having to type a path. You can still pass a path
-directly if you'd rather:
+Run it with no arguments and a native file-picker window opens for choosing a video,
+instead of having to type a path. You can still pass a path directly if you'd rather:
 
 ```
 python ascii_terminal.py path\to\video.mp4
 ```
 
-The console window is maximized automatically before playback starts (best-effort --
-see the `--no-fullscreen` note below). Press Ctrl+C to stop.
+The console window is maximized/fullscreened automatically before playback starts
+(best-effort -- see the `--no-fullscreen` note below). Press Ctrl+C to stop.
 
 Args:
 - `--cols` / `--rows` — character grid size (default: auto-fit to the current terminal
@@ -63,13 +62,23 @@ Args:
     Windows consoles that don't natively support ANSI escape codes.
   - `fit_grid()` picks the largest character grid that fits the terminal while
     preserving the source video's aspect ratio.
-  - `maximize_console()` maximizes the console window via `ctypes`
-    (`GetConsoleWindow` + `ShowWindow`). This reliably works for a classic
-    conhost-based window (plain cmd.exe/PowerShell), but Windows Terminal hosts its
-    tabs in their own window separate from the hidden conhost pseudo-console
-    `GetConsoleWindow` returns -- on Windows Terminal this may silently do nothing,
-    which is a known OS-level limitation, not a bug here.
-  - `prompt_for_video()` lists video files next to the script and asks for a number.
+  - `make_console_fullscreen()` maximizes/fullscreens the terminal via `ctypes`.
+    Windows Terminal hosts its tabs in a window separate from the hidden conhost
+    pseudo-console that `GetConsoleWindow()` returns, so maximizing *that* handle
+    (an earlier version of this function) silently did nothing on Windows Terminal.
+    It now checks whether the current foreground window -- which, at the moment the
+    script starts, should be whatever terminal it was launched from -- is Windows
+    Terminal (by window class name `CASCADIA_HOSTING_WINDOW_CLASS`), and if so sends
+    it **F11**, its default fullscreen-toggle shortcut. Falls back to classic
+    `GetConsoleWindow` + `ShowWindow(SW_MAXIMIZE)` for conhost-based consoles (plain
+    cmd.exe/PowerShell windows not running inside Windows Terminal).
+  - `prompt_for_video()` opens a native file-picker window (`tkinter.filedialog`)
+    filtered to video extensions. Deliberately does *not* set the withdrawn Tk root's
+    `-topmost` attribute -- that combination is a known Windows/Tk trap where the
+    invisible root can end up as an always-on-top window that silently intercepts
+    every click on the whole screen until it's destroyed (a real bug hit during
+    development). `lift()`/`focus_force()` bring the actual dialog forward instead,
+    and `destroy()` is guaranteed via `try`/`finally`.
   - `play()` is the main loop: read frame -> resize -> (optionally quantize) ->
     ASCII+color -> ANSI string -> write to stdout -> pace to the frame schedule.
 
@@ -95,8 +104,11 @@ unsigned PCM via ffmpeg's own codec conversion (`-acodec pcm_u8 -ar 11025`) -- a
 retro format, not an effect applied afterward -- piped directly into memory as a numpy
 array (no temp file). The bundled `imageio-ffmpeg` package provides the ffmpeg binary,
 so nothing needs installing system-wide. If the video has no audio track (or
-extraction fails for any reason), playback silently continues without audio rather
-than crashing.
+extraction fails for any reason), playback continues without audio rather than
+crashing -- but not *silently*: both extraction and playback print a `[audio] ...`
+message explaining why on failure (ffmpeg error, no output device, playback exception,
+etc.), since a silent failure here was indistinguishable from "no audio track" and
+impossible to debug. Pass `verbose=False` to either function to suppress that.
 
 Playback uses `sounddevice` (`sd.play(samples, samplerate, loop=...)`), not the
 Windows-only `winsound` module used in an earlier version of this script --
