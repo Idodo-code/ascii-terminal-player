@@ -5,11 +5,12 @@ downsampled to genuine 8-bit PCM playing alongside it.
 
 ## Download (Windows, no setup required)
 
-**[Download the installer](https://github.com/Idodo-code/ascii-terminal-player/releases/latest)**
-and run it. It bundles Python, ffmpeg, and every dependency into a single `ascii.exe`
-(via PyInstaller), so nothing else needs installing on a fresh machine. The installer
-adds `ascii` to your PATH (per-user, no admin rights required) so it works from any
-`cmd`/PowerShell/Windows Terminal prompt, in any directory:
+[![Download for Windows](https://img.shields.io/badge/DOWNLOAD-Windows_Installer-2ea44f?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/Idodo-code/ascii-terminal-player/releases/latest/download/AsciiTerminalPlayer-Setup.exe)
+
+Run the downloaded installer. It bundles Python, ffmpeg, and every dependency into a
+single `ascii.exe` (via PyInstaller), so nothing else needs installing on a fresh
+machine. The installer adds `ascii` to your PATH (per-user, no admin rights required)
+so it works from any `cmd`/PowerShell/Windows Terminal prompt, in any directory:
 
 ```
 ascii
@@ -117,6 +118,3 @@ was the cause of a "played fine once, then no audio at all" bug. `sounddevice.pl
 explicitly stops any previous playback before starting a new one, verified reliable
 across repeated play/stop cycles in testing. `--audio-rate` controls how lo-fi/crunchy
 it sounds (lower = crunchier), and `--no-audio` disables it entirely.
-
-`test_clip.mp4` is a small synthetic sample (moving circle, no audio) used for pipeline
-testing -- safe to delete.
