@@ -26,16 +26,6 @@ ascii path\to\video.mp4 --cols 120 --loop
 Run `ascii --help` for the full option list. See `installer/setup.iss` for how the
 installer itself works (Inno Setup script, PATH handling via the registry).
 
-## Running from source
-
-```
-python -m pip install -r requirements.txt
-python ascii_terminal.py path\to\video.mp4
-```
-
-Behaves the same as the installed `ascii` command above (file picker when no path is
-given, same args). Press Ctrl+C to stop.
-
 Args:
 - `--cols` / `--rows` — character grid size (default: auto-fit to the current terminal
   size, accounting for terminal glyphs not being square).
