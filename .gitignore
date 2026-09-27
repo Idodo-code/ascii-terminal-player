@@ -3,3 +3,7 @@ __pycache__/
 venv/
 .claude/
 scratch_*
+build/
+dist/
+installer/output/
+*.spec

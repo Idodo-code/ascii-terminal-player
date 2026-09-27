@@ -37,8 +37,14 @@ def extract_8bit_samples(video_path, sample_rate=11025, verbose=True):
         return None
 
     if result.returncode != 0:
-        if verbose:
-            stderr = result.stderr.decode(errors="replace").strip()
+        stderr = result.stderr.decode(errors="replace").strip()
+        if "does not contain any stream" in stderr:
+            # The common, unremarkable case: the video simply has no audio
+            # track, which ffmpeg reports as a mapping failure rather than
+            # cleanly producing empty output.
+            if verbose:
+                print("[audio] No audio track found in this video.")
+        elif verbose:
             print(f"[audio] ffmpeg exited with code {result.returncode}"
                   f"{': ' + stderr if stderr else ''}")
         return None

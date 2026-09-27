@@ -281,8 +281,7 @@ def main():
 
     video_path = args.video
     if video_path is None:
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        video_path = prompt_for_video(script_dir)
+        video_path = prompt_for_video(os.getcwd())
         if video_path is None:
             return
 
