@@ -23,8 +23,7 @@ and options directly if you'd rather skip the file picker:
 ascii path\to\video.mp4 --cols 120 --loop
 ```
 
-Run `ascii --help` for the full option list. See `installer/setup.iss` for how the
-installer itself works (Inno Setup script, PATH handling via the registry).
+Run `ascii --help` for the full option list.
 
 Args:
 - `--cols` / `--rows` — character grid size (default: auto-fit to the current terminal
