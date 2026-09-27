@@ -4,7 +4,7 @@
 ; PowerShell/Windows Terminal prompt, in any directory.
 
 #define MyAppName "ASCII Terminal Player"
-#define MyAppVersion "1.0.1"
+#define MyAppVersion "1.0.2"
 #define MyAppExeName "ascii.exe"
 
 [Setup]
@@ -22,6 +22,7 @@ Compression=lzma2
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\{#MyAppExeName}
+SetupIconFile=..\assets\icon.ico
 
 [Files]
 ; The PyInstaller build is --onedir (a folder: ascii.exe + its _internal
@@ -31,8 +32,12 @@ UninstallDisplayIcon={app}\{#MyAppExeName}
 ; step, so startup is close to instant.
 Source: "..\dist\ascii\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
+[Tasks]
+Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional icons:"; Flags: unchecked
+
 [Icons]
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Code]
 const
