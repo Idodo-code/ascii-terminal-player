@@ -3,27 +3,38 @@
 Plays a video file directly in the terminal as live colored ASCII art, with its audio
 downsampled to genuine 8-bit PCM playing alongside it.
 
-## Setup
+## Download (Windows, no setup required)
+
+**[Download the installer](https://github.com/Idodo-code/ascii-terminal-player/releases/latest)**
+and run it. It bundles Python, ffmpeg, and every dependency into a single `ascii.exe`
+(via PyInstaller), so nothing else needs installing on a fresh machine. The installer
+adds `ascii` to your PATH (per-user, no admin rights required) so it works from any
+`cmd`/PowerShell/Windows Terminal prompt, in any directory:
+
+```
+ascii
+```
+
+Open a **new** terminal window after installing -- already-open ones won't see the
+PATH update, which is normal Windows behavior, not a bug in the installer. Pass a path
+and options directly if you'd rather skip the file picker:
+
+```
+ascii path\to\video.mp4 --cols 120 --loop
+```
+
+Run `ascii --help` for the full option list. See `installer/setup.iss` for how the
+installer itself works (Inno Setup script, PATH handling via the registry).
+
+## Running from source
 
 ```
 python -m pip install -r requirements.txt
-```
-
-## Usage
-
-```
-python ascii_terminal.py
-```
-
-Run it with no arguments and a native file-picker window opens for choosing a video,
-instead of having to type a path. You can still pass a path directly if you'd rather:
-
-```
 python ascii_terminal.py path\to\video.mp4
 ```
 
-The console window is maximized/fullscreened automatically before playback starts
-(best-effort -- see the `--no-fullscreen` note below). Press Ctrl+C to stop.
+Behaves the same as the installed `ascii` command above (file picker when no path is
+given, same args). Press Ctrl+C to stop.
 
 Args:
 - `--cols` / `--rows` — character grid size (default: auto-fit to the current terminal
