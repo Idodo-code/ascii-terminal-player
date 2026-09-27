@@ -4,7 +4,7 @@
 ; PowerShell/Windows Terminal prompt, in any directory.
 
 #define MyAppName "ASCII Terminal Player"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppExeName "ascii.exe"
 
 [Setup]
@@ -24,7 +24,12 @@ ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\{#MyAppExeName}
 
 [Files]
-Source: "..\dist\ascii.exe"; DestDir: "{app}"; Flags: ignoreversion
+; The PyInstaller build is --onedir (a folder: ascii.exe + its _internal
+; dependencies), not --onefile. Onefile self-extracts the whole ~90MB bundle
+; to a temp dir on every launch before the program even starts, which is
+; what made "ascii" feel painfully slow to open -- onedir has no extraction
+; step, so startup is close to instant.
+Source: "..\dist\ascii\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
@@ -49,12 +54,19 @@ begin
   if (Paths <> '') and (Pos(';' + Uppercase(Path) + ';', ';' + Uppercase(Paths) + ';') > 0) then
     exit; // already present
 
-  if (Paths <> '') and (Paths[Length(Paths)] <> ';') then
-    Paths := Paths + ';';
-  Paths := Paths + Path;
+  // Prepended, not appended: if some other "ascii" (or anything else with a
+  // clashing name) already exists earlier on PATH, an appended entry loses
+  // to it silently -- exactly what happened during testing, where "ascii"
+  // resolved to something else until this entry was manually moved to the
+  // top. Prepending guarantees this one wins regardless of what else is
+  // already on PATH.
+  if Paths = '' then
+    Paths := Path
+  else
+    Paths := Path + ';' + Paths;
 
   if RegWriteStringValue(HKEY_CURRENT_USER, EnvironmentKey, 'Path', Paths) then
-    Log(Format('Added "%s" to PATH', [Path]))
+    Log(Format('Prepended "%s" to PATH', [Path]))
   else
     Log(Format('Failed to add "%s" to PATH', [Path]));
 end;
